@@ -22,14 +22,26 @@ jobs:
         run: |
           curl -LSs "https://raw.githubusercontent.com/SukiSU-Ultra/SukiSU-Ultra/main/kernel/setup.sh" | bash -s nongki
 
+      - name: Fix pgtable.h compatibility
+        run: |
+          echo '#include <asm/pgtable.h>' > include/linux/pgtable.h
+        working-directory: ${{ github.workspace }}
+
       - name: Build kernel
         run: |
           export ARCH=arm64
           export CROSS_COMPILE=aarch64-linux-gnu-
-          export KCFLAGS="-std=gnu11"
+          export KCFLAGS="-std=gnu11 -w"
           make O=out lifesteal_lisa_defconfig
-          make O=out -j$(nproc)
+          make O=out -j1 2>&1 | tee build.log; exit ${PIPESTATUS[0]}
         working-directory: ${{ github.workspace }}
+
+      - name: Upload build log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: build.log
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
