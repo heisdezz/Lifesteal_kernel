@@ -26,10 +26,10 @@ jobs:
         run: |
           export ARCH=arm64
           export CROSS_COMPILE=aarch64-linux-gnu-
+          export KCFLAGS="-std=gnu11"
           make O=out lifesteal_lisa_defconfig
           make O=out -j$(nproc)
         working-directory: ${{ github.workspace }}
-
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
