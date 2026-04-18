@@ -26,11 +26,12 @@ jobs:
         run: |
           export ARCH=arm64
           export CROSS_COMPILE=aarch64-linux-gnu-
-          make lifesteal_lisa_defconfig
-          make -j$(nproc)
+          make O=out lifesteal_lisa_defconfig
+          make O=out -j$(nproc)
+        working-directory: ${{ github.workspace }}
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: SukiSU-lisa-kernel
-          path: arch/arm64/boot/Image
+          path: out/arch/arm64/boot/Image
